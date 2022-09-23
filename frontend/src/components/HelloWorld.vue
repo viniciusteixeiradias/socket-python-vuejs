@@ -15,19 +15,19 @@ connect()
 
 function connect() {
   var ws = new WebSocket(`ws://localhost:8000/ws/${client_id}`)
-  ws.onmessage = function (event) {
+  ws.onmessage = (event) => {
     state.n1 = event.data as number
     showNotification()
   }
 
-  ws.onclose = function(e) {
+  ws.onclose = (e) => {
     console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
-    setTimeout(function() {
+    setTimeout(() => {
       connect();
     }, 5000);
   };
 
-  ws.onerror = function(err) {
+  ws.onerror = (err) => {
     console.error('Socket encountered error: ', err, 'Closing socket');
     ws.close();
   };

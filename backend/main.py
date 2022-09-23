@@ -1,9 +1,11 @@
 # uvicorn main:app --reload
 from ctypes import Union
 import string
+from time import sleep
 from typing import List
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
+import asyncio
 
 class Order(BaseModel):
   id: int
@@ -24,9 +26,6 @@ class ConnectionManager:
 
   def disconnect(self, websocket: WebSocket):
     self.active_connections.remove(websocket)
-
-  async def send_personal_message(self, message: str, websocket: WebSocket):
-    await websocket.send_text(message)
 
   async def broadcast(self, message: str):
     for connection in self.active_connections:
@@ -76,9 +75,8 @@ async def del_order(id: int):
 async def websocket_endpoint(websocket: WebSocket, client_id: int):
   try:
     await manager.connect(websocket)
+    await notifications(f"{len(ordens)}")
     while True:
-      await manager.broadcast(f"{len(ordens)}")
-      await websocket.receive_text()
+      await asyncio.sleep(5)
   except WebSocketDisconnect:
     manager.disconnect(websocket)
-    # await manager.broadcast(f"Client #{client_id} left the chat")
